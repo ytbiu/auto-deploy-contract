@@ -33,7 +33,7 @@ func main() {
 	api.RegisterDeployStakingRoutes(router)
 	api.RegisterDeployTokenRoutes(router)
 
-	log.Printf("Server starting on :8080")
+	log.Printf("Server starting on :8070")
 	if err := router.Run(":8070"); err != nil {
 		log.Fatal(err)
 	}
