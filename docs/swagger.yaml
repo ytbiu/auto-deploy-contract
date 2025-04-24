@@ -1,0 +1,182 @@
+definitions:
+  api.DeployIAORequest:
+    properties:
+      duration_hours:
+        example: 72
+        type: integer
+      owner:
+        example: 0xAE5015960Ff1E3ad095a7037533b1e3E7240b54D
+        type: string
+      reward_amount:
+        example: "2000000000000000000000000000"
+        type: string
+      reward_token:
+        example: 0x07D325030dA1A8c1f96C414BFFbe4fBD539CED45
+        type: string
+      start_timestamp:
+        example: 1743663600
+        type: integer
+    required:
+    - duration_hours
+    - owner
+    - reward_amount
+    - reward_token
+    - start_timestamp
+    type: object
+  api.DeployStakingRequest:
+    properties:
+      nft:
+        example: 0x07D325030dA1A8c1f96C414BFFbe4fBD539CED45
+        type: string
+      owner:
+        example: 0xAE5015960Ff1E3ad095a7037533b1e3E7240b54D
+        type: string
+      project_name:
+        example: My Project
+        type: string
+      reward_amount_per_year:
+        example: "2000000000000000000000000000"
+        type: string
+      reward_token:
+        example: 0x07D325030dA1A8c1f96C414BFFbe4fBD539CED45
+        type: string
+    required:
+    - nft
+    - owner
+    - project_name
+    - reward_amount_per_year
+    - reward_token
+    type: object
+  api.DeployTokenRequest:
+    properties:
+      owner:
+        example: 0xAE5015960Ff1E3ad095a7037533b1e3E7240b54D
+        type: string
+      token_amount_can_mint_per_year:
+        example: "6000000000000000000000000000"
+        type: string
+      token_init_supply:
+        example: "2000000000000000000000000000"
+        type: string
+      token_name:
+        example: TokenName
+        type: string
+      token_supply_fixed_years:
+        example: 8
+        type: integer
+      token_symbol:
+        example: TN
+        type: string
+    required:
+    - owner
+    - token_amount_can_mint_per_year
+    - token_init_supply
+    - token_name
+    - token_supply_fixed_years
+    - token_symbol
+    type: object
+  api.StandardResponse:
+    properties:
+      code:
+        description: Status code
+        type: integer
+      data:
+        description: Data
+      message:
+        description: Message
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /deploy/IAO:
+    post:
+      consumes:
+      - application/json
+      description: Deploy a new contract with the given parameters
+      parameters:
+      - description: Deployment parameters
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/api.DeployIAORequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.StandardResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.StandardResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.StandardResponse'
+      summary: Deploy contract
+      tags:
+      - deployment
+  /deploy/staking:
+    post:
+      consumes:
+      - application/json
+      description: Deploy a new contract with the given parameters
+      parameters:
+      - description: Deployment parameters
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/api.DeployStakingRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.StandardResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.StandardResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.StandardResponse'
+      summary: Deploy contract
+      tags:
+      - deployment
+  /deploy/token:
+    post:
+      consumes:
+      - application/json
+      description: Deploy a new contract with the given parameters
+      parameters:
+      - description: Deployment parameters
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/api.DeployTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.StandardResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.StandardResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.StandardResponse'
+      summary: Deploy contract
+      tags:
+      - deployment
+swagger: "2.0"
