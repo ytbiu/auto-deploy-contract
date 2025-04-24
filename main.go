@@ -34,7 +34,7 @@ func main() {
 	api.RegisterDeployTokenRoutes(router)
 
 	log.Printf("Server starting on :8080")
-	if err := router.Run(":8080"); err != nil {
+	if err := router.Run(":8070"); err != nil {
 		log.Fatal(err)
 	}
 }
