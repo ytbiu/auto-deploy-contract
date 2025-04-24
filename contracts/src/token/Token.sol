@@ -72,9 +72,9 @@ contract Token is
         uint256 _amountCanMintPerYear
     ) public initializer {
         __ERC20_init(name, symbol);
-        __ReentrancyGuard_init();
         __ERC20Permit_init(name);
         __ERC20Burnable_init();
+        __ReentrancyGuard_init();
         __UUPSUpgradeable_init();
         __Ownable_init(initialOwner);
 

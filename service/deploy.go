@@ -53,6 +53,12 @@ func DeployContract(path, envPath string, scriptEnvVars map[string]string, tp co
 	))
 	cmd.Dir = path
 
+	log.Printf("Executing command:  make %s PRIVATE_KEY=%s dbc-mainnet=%s MAIN_NET_VERIFIER_URL=%s",
+		deployTarget,
+		os.Getenv("PRIVATE_KEY"),
+		DBC_MAINNET,
+		MAIN_NET_VERIFIER_URL)
+
 	output, err := cmd.CombinedOutput()
 	log.Printf("Command output:\n%s", string(output))
 
