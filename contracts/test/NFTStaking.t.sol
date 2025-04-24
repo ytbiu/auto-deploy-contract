@@ -86,7 +86,7 @@ contract RentTest is Test {
         uint256 totalCalcPointBefore = nftStaking.totalCalcPoint();
         nftStaking.stake(_owner, machineId, nftTokens, nftTokensBalance);
         assertEq(nftToken.balanceOf(_owner, 1), 0, "owner erc1155 failed");
-        nftStaking.addDLCToStake(machineId, reserveAmount);
+        nftStaking.addTokenToStake(machineId, reserveAmount);
         vm.stopPrank();
         uint256 totalCalcPoint = nftStaking.totalCalcPoint();
 
