@@ -43,10 +43,19 @@ func DeployContract(path, envPath string, scriptEnvVars map[string]string, tp co
 	if tp == TOKEN {
 		deployTarget = "deploy-token-dbc-mainnet"
 	}
-	cmd := execCommand("make", deployTarget, "PRIVATE_KEY="+os.Getenv("PRIVATE_KEY"), " dbc-mainnet="+DBC_MAINNET, " MAIN_NET_VERIFIER_URL="+MAIN_NET_VERIFIER_URL)
+	// 修改命令参数的传递方式
+	cmd := execCommand("bash", "-c", fmt.Sprintf(
+		"make %s PRIVATE_KEY=%s dbc-mainnet=%s MAIN_NET_VERIFIER_URL=%s",
+		deployTarget,
+		os.Getenv("PRIVATE_KEY"),
+		DBC_MAINNET,
+		MAIN_NET_VERIFIER_URL,
+	))
 	cmd.Dir = path
 
 	output, err := cmd.CombinedOutput()
+	log.Printf("Command output:\n%s", string(output))
+
 	if err != nil {
 		return "", fmt.Errorf("deploy error: %v: %s", err, string(output))
 	}

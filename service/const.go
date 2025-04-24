@@ -16,10 +16,10 @@ var (
 )
 
 func Init(env string) {
-	if env == "prod" {
-		ContractEnvPath = "../contracts/.env"
-		ContractPath = "../contracts"
-	}
+	// if env == "prod" {
+	// 	ContractEnvPath = "../contracts/.env"
+	// 	ContractPath = "../contracts"
+	// }
 	log.Println("contract env file path: ", ContractEnvPath)
 	log.Println("contract file path: ", ContractPath)
 

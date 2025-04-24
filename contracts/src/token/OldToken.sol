@@ -12,6 +12,7 @@ import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
+/// @custom:oz-upgrades-from OldToken
 contract OldToken is
     Initializable,
     ERC20Upgradeable,

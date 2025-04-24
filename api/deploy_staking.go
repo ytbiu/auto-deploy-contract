@@ -16,12 +16,13 @@ import (
 // DeployStakingRequest represents the request body for deployment
 // @DeployStakingRequest
 type DeployStakingRequest struct {
-	ProjectName         string `json:"project_name" binding:"required" example:"My Project"`
-	RewardAmountPerYear string `json:"reward_amount_per_year" binding:"required" example:"2000000000000000000000000000"`
-	Owner               string `json:"owner" binding:"required" example:"0xAE5015960Ff1E3ad095a7037533b1e3E7240b54D"`
-	RewardToken         string `json:"reward_token" binding:"required" example:"0x07D325030dA1A8c1f96C414BFFbe4fBD539CED45"`
-	NFT                 string `json:"nft"  binding:"required" example:"0x07D325030dA1A8c1f96C414BFFbe4fBD539CED45"`
+	ProjectName         string `json:"project_name" binding:"required,nowhitespace" example:"Project"`
+	RewardAmountPerYear string `json:"reward_amount_per_year" binding:"required,nowhitespace" example:"2000000000000000000000000000"`
+	Owner               string `json:"owner" binding:"required,nowhitespace" example:"0xAE5015960Ff1E3ad095a7037533b1e3E7240b54D"`
+	RewardToken         string `json:"reward_token" binding:"required,nowhitespace" example:"0x07D325030dA1A8c1f96C414BFFbe4fBD539CED45"`
+	NFT                 string `json:"nft"  binding:"required,nowhitespace" example:"0x07D325030dA1A8c1f96C414BFFbe4fBD539CED45"`
 }
+
 
 func (req *DeployStakingRequest) ToMap() map[string]string {
 	return map[string]string{

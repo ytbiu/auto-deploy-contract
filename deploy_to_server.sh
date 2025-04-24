@@ -26,9 +26,9 @@ ssh $SERVER_USER@$SERVER_IP "pid=\$(ps aux | grep '[a]uto-deploy-contract' | awk
 
 # 上传到服务器
 echo "上传文件到服务器..."
-ssh $SERVER_USER@$SERVER_IP "rm -rf $SERVER_DIR/build/* && mkdir -p $SERVER_DIR/build"
-scp ./build/auto-deploy-contract $SERVER_USER@$SERVER_IP:$SERVER_DIR/build/
-scp ./build/.env $SERVER_USER@$SERVER_IP:$SERVER_DIR/build/
+ssh $SERVER_USER@$SERVER_IP "rm  $SERVER_DIR/auto-deploy-contract"
+scp ./build/auto-deploy-contract $SERVER_USER@$SERVER_IP:$SERVER_DIR/
+scp ./build/.env $SERVER_USER@$SERVER_IP:$SERVER_DIR/
 
 # 在服务器上启动服务
 echo "启动服务..."
@@ -40,7 +40,6 @@ if [ ! -z "$pid" ]; then
     kill $pid
     sleep 2
 fi
-cd build
 nohup ./auto-deploy-contract --env prod > output.log 2>&1 &
 EOF
 
