@@ -57,10 +57,8 @@ contract OldToken is
     }
 
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() initializer {}
-
-    function _authorizeUpgrade(address newImplementation) internal view override onlyOwner {
-        require(newImplementation != address(0), "Invalid implementation address");
+    constructor() {
+        _disableInitializers();
     }
 
     function initialize(
@@ -85,6 +83,10 @@ contract OldToken is
         _mint(initialOwner, initSupply);
         isLockActive = true;
         deployedAt = block.timestamp;
+    }
+
+    function _authorizeUpgrade(address newImplementation) internal view override onlyOwner {
+        require(newImplementation != address(0), "Invalid implementation address");
     }
 
     function disableLockPermanently() external onlyOwner {
