@@ -3,6 +3,7 @@ package main
 import (
 	"auto-deploy-contract/api"
 	"auto-deploy-contract/api/middleware"
+	"flag"
 	"log"
 
 	_ "auto-deploy-contract/docs"
@@ -20,6 +21,15 @@ func init() {
 }
 
 func main() {
+	// 添加环境参数
+	env := flag.String("env", "dev", "(dev/prod)")
+	flag.Parse()
+
+	service.Init(*env)
+	if *env == "prod" {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	router := gin.Default()
 
 	// 添加全局Basic Auth中间件
@@ -33,8 +43,8 @@ func main() {
 	api.RegisterDeployStakingRoutes(router)
 	api.RegisterDeployTokenRoutes(router)
 
-	log.Printf("Server starting on :8070")
-	if err := router.Run(":8070"); err != nil {
+	log.Printf("Server starting on :8070 in %s mode", *env)
+	if err := router.Run("0.0.0.0:8070"); err != nil {
 		log.Fatal(err)
 	}
 }

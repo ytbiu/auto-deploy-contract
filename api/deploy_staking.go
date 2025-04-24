@@ -75,7 +75,7 @@ func handleDeployStaking(c *gin.Context) {
 		return
 	}
 
-	proxyAddr, err := service.DeployContract(service.CONTRACTS_PATH, service.CONTRACTS_ENV_PATH, req.ToMap(), service.STAKING)
+	proxyAddr, err := service.DeployContract(service.ContractPath, service.ContractEnvPath, req.ToMap(), service.STAKING)
 	if err != nil {
 		c.JSON(200, StandardResponse{
 			Code:    500,

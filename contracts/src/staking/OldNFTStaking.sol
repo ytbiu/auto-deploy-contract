@@ -111,7 +111,7 @@ contract OldNFTStaking is
         uint256 nextRenterCanRentAt;
     }
 
-    mapping(address => bool) public dlcClientWalletAddress;
+    mapping(address => bool) public clientWalletAddress;
     mapping(address => string[]) public holder2MachineIds;
     mapping(string => LockedRewardDetail[]) public machineId2LockedRewardDetails;
     mapping(string => ApprovedReportInfo[]) private pendingSlashedMachineId2Renter;
@@ -128,7 +128,7 @@ contract OldNFTStaking is
     event StakedGPUType(string machineId, string gpuType);
     event AddedStakeHours(address indexed stakeholder, string machineId, uint256 stakeHours);
 
-    event ReserveDLC(string machineId, uint256 amount);
+    event Reserve(string machineId, uint256 amount);
     event Unstaked(address indexed stakeholder, string machineId, uint256 paybackReserveAmount);
     event Claimed(
         address indexed stakeholder,
@@ -211,7 +211,7 @@ contract OldNFTStaking is
     }
 
     modifier onlyClientWallet() {
-        require(dlcClientWalletAddress[msg.sender], NotAdmin());
+        require(clientWalletAddress[msg.sender], NotAdmin());
         _;
     }
 
@@ -273,8 +273,8 @@ contract OldNFTStaking is
     function setClientWallets(address[] calldata addrs) external onlyOwner {
         for (uint256 i = 0; i < addrs.length; i++) {
             require(addrs[i] != address(0), ZeroAddress());
-            require(dlcClientWalletAddress[addrs[i]] == false, AddressExists());
-            dlcClientWalletAddress[addrs[i]] = true;
+            require(clientWalletAddress[addrs[i]] == false, AddressExists());
+            clientWalletAddress[addrs[i]] = true;
         }
     }
 
@@ -282,7 +282,7 @@ contract OldNFTStaking is
         dbcAIContract = IDBCAIContract(addr);
     }
 
-    function addDLCToStake(string memory machineId, uint256 amount) external nonReentrant {
+    function addTokenToStake(string memory machineId, uint256 amount) external nonReentrant {
         require(isStaking(machineId), MachineNotStaked(machineId));
         if (amount == 0) {
             return;
@@ -304,7 +304,7 @@ contract OldNFTStaking is
         }
 
         _joinStaking(machineId, stakeInfo.calcPoint, amount + stakeInfo.reservedAmount);
-        emit ReserveDLC(machineId, amount);
+        emit Reserve(machineId, amount);
     }
 
     function revertIfMachineInfoCanNotStake(uint256 calcPoint, string memory gpuType, uint256 mem) internal pure {
@@ -331,7 +331,7 @@ contract OldNFTStaking is
         uint256[] memory nftTokenIdBalances
     ) {
         require(pendingSlashedMachineId2Renter[machineId].length == 0, ShouldPaySlashBeforeStake());
-        require(dlcClientWalletAddress[msg.sender], NotAdmin());
+        require(clientWalletAddress[msg.sender], NotAdmin());
         StakeInfo memory stakeInfo = machineId2StakeInfos[machineId];
         require(stakeInfo.nftTokenIds.length == 0, IsStaking());
         require(dbcAIContract.freeGpuAmount(machineId) >= 1, MachineNotStakeEnoughDBC());
