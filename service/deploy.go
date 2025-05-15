@@ -14,6 +14,7 @@ const (
 	IAO contractType = iota
 	STAKING
 	TOKEN
+	PAYMENT
 )
 
 // execCommand is used to make the function testable
@@ -43,7 +44,9 @@ func DeployContract(path, envPath string, scriptEnvVars map[string]string, tp co
 	if tp == TOKEN {
 		deployTarget = "deploy-token-dbc-mainnet"
 	}
-	// 修改命令参数的传递方式
+    if tp == PAYMENT {
+        deployTarget = "deploy-token-payment-mainnet"
+    }
 	cmd := execCommand("bash", "-c", fmt.Sprintf(
 		"make %s PRIVATE_KEY=%s dbc-mainnet=%s MAIN_NET_VERIFIER_URL=%s",
 		deployTarget,

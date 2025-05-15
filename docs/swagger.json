@@ -50,6 +50,52 @@
                 }
             }
         },
+        "/deploy/payment": {
+            "post": {
+                "description": "Deploy a new contract with the given parameters",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "deployment"
+                ],
+                "summary": "Deploy contract",
+                "parameters": [
+                    {
+                        "description": "Deployment parameters",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.DeployPaymentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.StandardResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.StandardResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.StandardResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/deploy/staking": {
             "post": {
                 "description": "Deploy a new contract with the given parameters",
@@ -176,6 +222,53 @@
                 }
             }
         },
+        "api.DeployPaymentRequest": {
+            "type": "object",
+            "required": [
+                "address_free_request_count",
+                "free_request_count",
+                "min_usd_balance_for_using_free_request",
+                "owner",
+                "payment_token",
+                "vip_monthly_quotas",
+                "vip_price_fixed_count",
+                "vip_price_monthly"
+            ],
+            "properties": {
+                "address_free_request_count": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "free_request_count": {
+                    "type": "integer",
+                    "example": 100
+                },
+                "min_usd_balance_for_using_free_request": {
+                    "type": "integer",
+                    "example": 100000
+                },
+                "owner": {
+                    "type": "string",
+                    "example": "0xAE5015960Ff1E3ad095a7037533b1e3E7240b54D"
+                },
+                "payment_token": {
+                    "type": "string",
+                    "example": "0x07D325030dA1A8c1f96C414BFFbe4fBD539CED45"
+                },
+                "vip_monthly_quotas": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "vip_price_fixed_count": {
+                    "type": "integer",
+                    "example": 100000
+                },
+                "vip_price_monthly": {
+                    "type": "integer",
+                    "example": 100000
+                }
+            }
+        },
         "api.DeployStakingRequest": {
             "type": "object",
             "required": [
@@ -196,7 +289,7 @@
                 },
                 "project_name": {
                     "type": "string",
-                    "example": "My Project"
+                    "example": "Project"
                 },
                 "reward_amount_per_year": {
                     "type": "string",
