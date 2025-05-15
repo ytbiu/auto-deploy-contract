@@ -248,34 +248,42 @@ const docTemplate = `{
             ],
             "properties": {
                 "address_free_request_count": {
+                    "description": "Number of free requests available for each address",
                     "type": "integer",
                     "example": 10
                 },
                 "free_request_count": {
+                    "description": "Number of free requests available for the contract",
                     "type": "integer",
                     "example": 100
                 },
                 "min_usd_balance_for_using_free_request": {
+                    "description": "Minimum USD balance required for using free requests for the address",
                     "type": "integer",
                     "example": 100000
                 },
                 "owner": {
+                    "description": "Owner address of the contract",
                     "type": "string",
                     "example": "0xAE5015960Ff1E3ad095a7037533b1e3E7240b54D"
                 },
                 "payment_token": {
+                    "description": "Payment token address",
                     "type": "string",
                     "example": "0x07D325030dA1A8c1f96C414BFFbe4fBD539CED45"
                 },
                 "vip_monthly_quotas": {
+                    "description": "Number of VIP requests available for each month",
                     "type": "integer",
                     "example": 10
                 },
                 "vip_price_fixed_count": {
+                    "description": "Fixed price for VIP requests",
                     "type": "integer",
                     "example": 100000
                 },
                 "vip_price_monthly": {
+                    "description": "Monthly price for VIP requests",
                     "type": "integer",
                     "example": 100000
                 }

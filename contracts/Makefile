@@ -68,7 +68,7 @@ deploy-token-dbc-mainnet:
 		exit 1; \
 	fi
 
-deploy-token-payment-mainnet:
+deploy-payment-mainnet:
 	@if [ -f .env ]; then \
 		export $$(grep -v '^#' .env | xargs); \
 		forge script script/payment/Deploy.s.sol:Deploy \
@@ -85,5 +85,3 @@ deploy-token-payment-mainnet:
 		echo "Error: .env file not found"; \
 		exit 1; \
 	fi
-
-	source .env && forge script script/payment/Upgrade.s.sol:Upgrade --rpc-url dbc-mainnet --broadcast --verify --verifier blockscout --verifier-url $MAIN_NET_VERIFIER_URL --force --skip-simulation --legacy

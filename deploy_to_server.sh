@@ -30,6 +30,9 @@ ssh $SERVER_USER@$SERVER_IP "rm  $SERVER_DIR/auto-deploy-contract"
 scp ./build/auto-deploy-contract $SERVER_USER@$SERVER_IP:$SERVER_DIR/
 scp ./build/.env $SERVER_USER@$SERVER_IP:$SERVER_DIR/
 
+echo "拉去git代码"
+ssh $SERVER_USER@$SERVER_IP "cd $SERVER_DIR && git pull"
+
 # 在服务器上启动服务
 echo "启动服务..."
 ssh $SERVER_USER@$SERVER_IP << 'EOF'
