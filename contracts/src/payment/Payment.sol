@@ -45,6 +45,11 @@ contract Payment is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     event requestVIP(address indexed user, uint256 quotas);
     event requestFree(address indexed user, uint256 userFreeQuotas, uint256 globalReeQuotas);
 
+    function canUseFreeRequest(address addr) internal view returns (bool) {
+        uint256 minAmount = tokenAmountInUSD(minUSDBalanceForUsingFreeRequest);
+        return paymentToken.balanceOf(addr) < minAmount && freeRequestCount == 0;
+    }
+
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
@@ -68,8 +73,6 @@ contract Payment is Initializable, UUPSUpgradeable, OwnableUpgradeable {
 
         paymentToken = IPaymentToken(_paymentToken);
 
-        //        usdt = IERC20(0x5155101187F8Faa1aD8AfeC7820c801870F81D52);
-        usdt = IERC20(0x91635139C096e04206F22471F06CD10675bF9981);
         freeRequestCount = _freeRequestCount;
         addressFreeRequestCount = _addressFreeRequestCount;
         minUSDBalanceForUsingFreeRequest = _minUSDBalanceInUSDForUsingFreeRequest;
@@ -133,7 +136,7 @@ contract Payment is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function getFreeRequestAmount(address addr) public view returns (uint256) {
-        if (usdt.balanceOf(addr) < minUSDBalanceForUsingFreeRequest && freeRequestCount == 0) {
+        if (!canUseFreeRequest(addr)) {
             return 0;
         }
 
@@ -151,7 +154,7 @@ contract Payment is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function tryUseFreeRequest() internal returns (bool) {
-        if (usdt.balanceOf(msg.sender) < minUSDBalanceForUsingFreeRequest && freeRequestCount == 0) {
+        if (!canUseFreeRequest(msg.sender)) {
             return false;
         }
 

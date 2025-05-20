@@ -5,12 +5,12 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "./Types.sol";
+import "../../lib/openzeppelin-contracts/contracts/utils/math/Math.sol";
 
 /// @title Payment Contract for VIP Service Management
 /// @notice This contract manages VIP subscriptions with two payment models:
 /// 1. Monthly subscription with time-based quotas
 /// 2. Fixed-count subscription with usage-based quotas
-/// @custom:oz-upgrades-from OldPayment
 contract OldPayment is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     /// @notice Number of decimals used for USD amounts
     uint256 constant USD_DECIMALS = 6;
@@ -44,6 +44,11 @@ contract OldPayment is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     event requestVIP(address indexed user, uint256 quotas);
     event requestFree(address indexed user, uint256 userFreeQuotas, uint256 globalReeQuotas);
 
+    function canUseFreeRequest(address addr) internal view returns (bool) {
+        uint256 minAmount = tokenAmountInUSD(minUSDBalanceForUsingFreeRequest);
+        return paymentToken.balanceOf(addr) < minAmount && freeRequestCount == 0;
+    }
+
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
@@ -67,8 +72,6 @@ contract OldPayment is Initializable, UUPSUpgradeable, OwnableUpgradeable {
 
         paymentToken = IPaymentToken(_paymentToken);
 
-        //        usdt = IERC20(0x5155101187F8Faa1aD8AfeC7820c801870F81D52);
-        usdt = IERC20(0x91635139C096e04206F22471F06CD10675bF9981);
         freeRequestCount = _freeRequestCount;
         addressFreeRequestCount = _addressFreeRequestCount;
         minUSDBalanceForUsingFreeRequest = _minUSDBalanceInUSDForUsingFreeRequest;
@@ -91,12 +94,38 @@ contract OldPayment is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         uint256 _vipMonthlyQuotas,
         uint256 _vipPriceMonthly,
         uint256 _vipPriceFixedCount,
-        uint256 _minVIPFixCountToPay
+        uint256 _minVIPFixCountToPay,
+        uint256 _globalFreeRequestCount,
+        uint256 _addressFreeRequestCount
     ) external onlyOwner {
         vipMonthlyQuotas = _vipMonthlyQuotas;
         vipPriceMonthly = _vipPriceMonthly;
         vipPriceFixedCount = _vipPriceFixedCount;
         minVIPFixCountToPay = _minVIPFixCountToPay;
+        freeRequestCount = _globalFreeRequestCount;
+        addressFreeRequestCount = _addressFreeRequestCount;
+    }
+
+    function getConfig()
+    external
+    view
+    returns (
+        uint256 _vipMonthlyQuotas,
+        uint256 _vipPriceMonthly,
+        uint256 _vipPriceFixedCount,
+        uint256 _minVIPFixCountToPay,
+        uint256 _globalFreeRequestCount,
+        uint256 _addressFreeRequestCount
+    )
+    {
+        return (
+            vipMonthlyQuotas,
+            vipPriceMonthly,
+            vipPriceFixedCount,
+            minVIPFixCountToPay,
+            freeRequestCount,
+            addressFreeRequestCount
+        );
     }
 
     /// @notice Sets the payment token contract address
@@ -105,20 +134,42 @@ contract OldPayment is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         paymentToken = IPaymentToken(_token);
     }
 
+    function getFreeRequestAmount(address addr) public view returns (uint256) {
+        if (!canUseFreeRequest(addr)) {
+            return 0;
+        }
+
+        uint256 freeAmountForAddress;
+        if (address2FreeRequestCount[msg.sender] < addressFreeRequestCount) {
+            freeAmountForAddress = addressFreeRequestCount - address2FreeRequestCount[msg.sender];
+        }
+
+        uint256 globalFreeAmount;
+        if (freeRequestCount > 0) {
+            globalFreeAmount = freeRequestCount;
+        }
+
+        return Math.max(freeAmountForAddress, globalFreeAmount);
+    }
+
     function tryUseFreeRequest() internal returns (bool) {
-        if (usdt.balanceOf(msg.sender) < minUSDBalanceForUsingFreeRequest && freeRequestCount == 0) {
+        if (!canUseFreeRequest(msg.sender)) {
             return false;
         }
 
-        if (address2FreeRequestCount[msg.sender] > 0) {
-            address2FreeRequestCount[msg.sender] -= 1;
+        bool used;
+        if (address2FreeRequestCount[msg.sender] + 1 <= addressFreeRequestCount) {
+            address2FreeRequestCount[msg.sender] += 1;
+            used = true;
         }
 
-        if (freeRequestCount > 0) {
+        if (freeRequestCount - 1 >= 0) {
             freeRequestCount -= 1;
+            used = true;
         }
+
         emit requestFree(msg.sender, address2FreeRequestCount[msg.sender], freeRequestCount);
-        return true;
+        return used;
     }
 
     /// @notice Purchases monthly VIP subscription
@@ -225,13 +276,24 @@ contract OldPayment is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     function request(uint256 _quotas) external {
         require(_quotas > 0, "_quotas zero");
 
+        uint256 usedFreeRequest;
+        for (uint256 i = 0; i < _quotas; i++) {
+            bool useFreeRequest = tryUseFreeRequest();
+            if (useFreeRequest) {
+                usedFreeRequest += 1;
+            } else {
+                break;
+            }
+        }
+
+        if (usedFreeRequest == _quotas) {
+            return;
+        }
+
+        _quotas -= usedFreeRequest;
         uint256 availableQuotas = remainingAmount(msg.sender);
         require(availableQuotas >= _quotas, "insufficient");
 
-        bool useFreeRequest = tryUseFreeRequest();
-        if (useFreeRequest) {
-            return;
-        }
         VIPDetail storage vipDetail = address2VIPDetail[msg.sender];
         vipDetail.usedQuotas += _quotas;
 
