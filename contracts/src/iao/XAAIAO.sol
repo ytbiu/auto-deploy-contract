@@ -52,7 +52,7 @@ contract XAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     mapping(address => bool) public admins;
 
     IOracle public oracle;
-    bool public isSuccess;
+    bool public succeed;
 
     // Events
 
@@ -137,8 +137,8 @@ contract XAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         require(userDeposits[msg.sender] > 0, "No deposit found");
 
         if (isSuccess()) {
-            if (!isSuccess) {
-                isSuccess = true;
+            if (!succeed) {
+                succeed = true;
             }
 
             uint256 userReward = getReward(msg.sender);
@@ -261,9 +261,9 @@ contract XAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         return (_deposit, depositIncrByNFT, incrByNFTTier);
     }
 
-    function isSuccess() external view returns (bool) {
+    function isSuccess() public view returns (bool) {
         require(block.timestamp >= endTime, "Distribution not end");
-        if (isSuccess) {
+        if (succeed) {
             return true;
         }
         uint256 tokenInPrice = oracle.getTokenPriceInUSD(10, address(tokenIn));
