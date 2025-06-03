@@ -107,16 +107,16 @@ contract OldPayment is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function getConfig()
-    external
-    view
-    returns (
-        uint256 _vipMonthlyQuotas,
-        uint256 _vipPriceMonthly,
-        uint256 _vipPriceFixedCount,
-        uint256 _minVIPFixCountToPay,
-        uint256 _globalFreeRequestCount,
-        uint256 _addressFreeRequestCount
-    )
+        external
+        view
+        returns (
+            uint256 _vipMonthlyQuotas,
+            uint256 _vipPriceMonthly,
+            uint256 _vipPriceFixedCount,
+            uint256 _minVIPFixCountToPay,
+            uint256 _globalFreeRequestCount,
+            uint256 _addressFreeRequestCount
+        )
     {
         return (
             vipMonthlyQuotas,

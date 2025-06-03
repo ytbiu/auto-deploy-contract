@@ -8,6 +8,10 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 
+interface IOracle {
+    function getTokenPriceInUSD(uint32 secondsAgo, address token) external view returns (uint256);
+}
+
 interface IXAANFTHolder {
     function amountIncrByTokenId(address user, uint256 amount) external view returns (uint256);
     function userMaxTokenId(address user) external pure returns (uint256);
@@ -46,11 +50,16 @@ contract XAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     mapping(address => bool) public hasClaimed;
 
     mapping(address => bool) public admins;
+
+    IOracle public oracle;
+    bool public isSuccess;
+
     // Events
 
     event DepositTokenInIncrByNFT(address indexed user, uint256 amount);
     event DepositTokenIn(address indexed user, uint256 amount);
     event RewardsClaimed(address indexed user, uint256 amount);
+    event TokenInClaimedBack(address indexed user, uint256 amount);
     event DepositedTokenClaimed(uint256 amount);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
@@ -78,6 +87,7 @@ contract XAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         endTime = _startTime + depositPeriod;
         totalReward = _totalReward;
         xaaNFTHolder = IXAANFTHolder(_xaaNFTHolder);
+        oracle = IOracle(0x4bb48d5821cb668B663f74111D06D6B0060d2950);
     }
 
     /**
@@ -126,16 +136,27 @@ contract XAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         require(!hasClaimed[msg.sender], "Rewards already claimed");
         require(userDeposits[msg.sender] > 0, "No deposit found");
 
-        uint256 userReward = getReward(msg.sender);
-        require(userReward > 0, "No reward found");
+        if (isSuccess()) {
+            if (!isSuccess) {
+                isSuccess = true;
+            }
 
-        // Mark rewards as claimed
-        hasClaimed[msg.sender] = true;
+            uint256 userReward = getReward(msg.sender);
+            require(userReward > 0, "No reward found");
 
-        // Transfer rewards to the user
-        require(rewardToken.transfer(msg.sender, userReward), "rewards transfer failed");
+            // Mark rewards as claimed
+            hasClaimed[msg.sender] = true;
 
-        emit RewardsClaimed(msg.sender, userReward);
+            // Transfer rewards to the user
+            require(rewardToken.transfer(msg.sender, userReward), "rewards transfer failed");
+
+            emit RewardsClaimed(msg.sender, userReward);
+        } else {
+            hasClaimed[msg.sender] = true;
+            uint256 tokenInAmount = userDeposits[msg.sender];
+            require(tokenIn.transfer(msg.sender, tokenInAmount), "tokenIn transfer failed");
+            emit TokenInClaimedBack(msg.sender, tokenInAmount);
+        }
     }
 
     /**
@@ -238,5 +259,16 @@ contract XAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         incrByNFTTier = xaaNFTHolder.userMaxTokenId(user);
 
         return (_deposit, depositIncrByNFT, incrByNFTTier);
+    }
+
+    function isSuccess() external view returns (bool) {
+        require(block.timestamp >= endTime, "Distribution not end");
+        if (isSuccess) {
+            return true;
+        }
+        uint256 tokenInPrice = oracle.getTokenPriceInUSD(10, address(tokenIn));
+        uint256 tokenInAmount = tokenIn.balanceOf(address(this));
+        uint256 tokenInUSD = tokenInAmount * tokenInPrice;
+        return tokenInUSD >= 2000 * 1e6;
     }
 }
