@@ -54,7 +54,7 @@ contract XAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     IOracle public oracle;
     bool public succeed;
 
-    uint256 public minDepositBalance = 2000 * 1e18;
+    uint256 public minDepositBalance = 1500 * 1e18;
 
     // Events
 
