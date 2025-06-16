@@ -54,6 +54,8 @@ contract XAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     IOracle public oracle;
     bool public succeed;
 
+    uint256 public minDepositBalance = 2000 * 1e18;
+
     // Events
 
     event DepositTokenInIncrByNFT(address indexed user, uint256 amount);
@@ -244,6 +246,10 @@ contract XAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         endTime = _endTime;
     }
 
+
+    function setMinDepositBalance(uint256 _minDepositBalance) external onlyOwner {
+        minDepositBalance = _minDepositBalance;
+    }
     function setAdmin(address _admin, bool _isAdmin) external onlyOwner {
         admins[_admin] = _isAdmin;
     }
@@ -269,6 +275,6 @@ contract XAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         uint256 tokenInPrice = oracle.getTokenPriceInUSD(10, address(tokenIn));
         uint256 tokenInAmount = tokenIn.balanceOf(address(this));
         uint256 tokenInUSD = tokenInAmount * tokenInPrice;
-        return tokenInUSD >= 2000 * 1e6;
+        return tokenInUSD >= minDepositBalance * 1e6;
     }
 }
