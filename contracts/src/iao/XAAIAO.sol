@@ -54,7 +54,7 @@ contract XAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     IOracle public oracle;
     bool public succeed;
 
-    uint256 public minDepositBalance = 1500 * 1e18;
+    uint256 public minDepositBalance;
 
     // Events
 
@@ -91,6 +91,7 @@ contract XAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         totalReward = _totalReward;
         xaaNFTHolder = IXAANFTHolder(_xaaNFTHolder);
         oracle = IOracle(0x4bb48d5821cb668B663f74111D06D6B0060d2950);
+        minDepositBalance = 1500 * 1e18;
     }
 
     /**
