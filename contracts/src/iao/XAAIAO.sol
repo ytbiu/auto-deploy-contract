@@ -63,6 +63,7 @@ contract XAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     event RewardsClaimed(address indexed user, uint256 amount);
     event TokenInClaimedBack(address indexed user, uint256 amount);
     event DepositedTokenClaimed(uint256 amount);
+    event TimeUpdated(uint256 startTime, uint256 endTime);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -244,6 +245,7 @@ contract XAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     function setTimeFor(uint256 _startTime, uint256 _endTime) external onlyAdminOrOwner {
         startTime = _startTime;
         endTime = _endTime;
+        emit TimeUpdated(startTime, endTime);
     }
 
 
