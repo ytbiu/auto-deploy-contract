@@ -36,6 +36,7 @@ contract Token is
     uint256 public amountCanMintPerYear;
     uint256 public lockLimit;
     uint256 public deployedAt;
+    uint256 public amountToIAO;
 
     mapping(uint256 => uint256) public mintedPerYear;
     mapping(address => LockInfo[]) private walletLockTimestamp;
@@ -67,7 +68,9 @@ contract Token is
         string calldata symbol,
         uint256 _initSupply,
         uint256 _supplyFixedYears,
-        uint256 _amountCanMintPerYear
+        uint256 _amountCanMintPerYear,
+        address _iaoContractAddress,
+        uint256 _amountToIAO
     ) public initializer {
         __ERC20_init(name, symbol);
         __ERC20Permit_init(name);
@@ -76,11 +79,13 @@ contract Token is
         __UUPSUpgradeable_init();
         __Ownable_init(initialOwner);
 
+        amountToIAO = _amountToIAO;
         initSupply = _initSupply;
         supplyFixedYears = _supplyFixedYears;
         amountCanMintPerYear = _amountCanMintPerYear;
         lockLimit = 100;
-        _mint(initialOwner, initSupply);
+        _mint(initialOwner, initSupply-amountToIAO);
+        _mint(_iaoContractAddress, amountToIAO);
         isLockActive = true;
         deployedAt = block.timestamp;
     }

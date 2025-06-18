@@ -94,6 +94,12 @@ definitions:
     type: object
   api.DeployTokenRequest:
     properties:
+      amount_to_iao:
+        example: "100000000000000000000000000"
+        type: string
+      iao_contract_address:
+        example: 0xAE5015960Ff1E3ad095a7037533b1e3E7240b54D
+        type: string
       owner:
         example: 0xAE5015960Ff1E3ad095a7037533b1e3E7240b54D
         type: string
@@ -113,6 +119,8 @@ definitions:
         example: TN
         type: string
     required:
+    - amount_to_iao
+    - iao_contract_address
     - owner
     - token_amount_can_mint_per_year
     - token_init_supply

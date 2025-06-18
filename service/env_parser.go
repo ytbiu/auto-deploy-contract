@@ -25,6 +25,7 @@ func WriteEnv(envVars map[string]string, path string, tp contractType) error {
 	if tp == IAO {
 		envVars["XAAIAO_TOKEN_IN_CONTRACT"] = XAAIAO_TOKEN_IN_CONTRACT
 		envVars["XAAIAO_NFT_HOLDER_CONTRACT"] = XAAIAO_NFT_HOLDER_CONTRACT
+
 	}
 	if tp == STAKING {
 		envVars["DBC_AI_PROXY"] = DBC_AI_PROXY

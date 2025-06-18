@@ -53,11 +53,17 @@ contract Deploy is Script {
         uint256 amountCanMintPerYear = uint256(vm.envInt("TOKEN_AMOUNT_CAN_MINT_PER_YEAR"));
         console.log("after fixed year, can mint amount per year :", amountCanMintPerYear);
 
+        address iaoContractAddress = vm.envAddress("IAO_CONTRACT_ADDRESS");
+        console.log("iaoContractAddress :", iaoContractAddress);
+
+        uint256 amountToIAO = uint256(vm.envInt("AMOUNT_TO_IAO"));
+        console.log("amountToIAO :",  amountToIAO);
+
         proxy = Upgrades.deployUUPSProxy(
             "Token.sol:Token",
             abi.encodeCall(
                 Token.initialize,
-                (tokenOwner, tokenName, tokenSymbol, initSupply, supplyFixedYears, amountCanMintPerYear)
+                (tokenOwner, tokenName, tokenSymbol, initSupply, supplyFixedYears, amountCanMintPerYear,iaoContractAddress,amountToIAO)
             )
         );
         return (proxy, logic);

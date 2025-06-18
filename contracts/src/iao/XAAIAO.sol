@@ -184,7 +184,11 @@ contract XAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     function claimDepositedToken() external onlyAfterDistribution onlyOwner {
         uint256 balance = tokenIn.balanceOf(address(this));
         require(balance > 0, "No balance claim");
-
+        if (isSuccess()) {
+            if (!succeed) {
+                succeed = true;
+            }
+        }
         // Transfer all remaining TokenIn to the owner
         SafeERC20.safeTransfer(tokenIn, msg.sender, balance);
         emit DepositedTokenClaimed(balance);

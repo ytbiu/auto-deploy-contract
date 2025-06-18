@@ -324,6 +324,8 @@ const docTemplate = `{
         "api.DeployTokenRequest": {
             "type": "object",
             "required": [
+                "amount_to_iao",
+                "iao_contract_address",
                 "owner",
                 "token_amount_can_mint_per_year",
                 "token_init_supply",
@@ -332,6 +334,14 @@ const docTemplate = `{
                 "token_symbol"
             ],
             "properties": {
+                "amount_to_iao": {
+                    "type": "string",
+                    "example": "100000000000000000000000000"
+                },
+                "iao_contract_address": {
+                    "type": "string",
+                    "example": "0xAE5015960Ff1E3ad095a7037533b1e3E7240b54D"
+                },
                 "owner": {
                     "type": "string",
                     "example": "0xAE5015960Ff1E3ad095a7037533b1e3E7240b54D"
