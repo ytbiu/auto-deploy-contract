@@ -24,8 +24,8 @@ type DeployTokenRequest struct {
 	TokenInitSupply           string `json:"token_init_supply" binding:"required" example:"2000000000000000000000000000"`
 	TokenSupplyFixedYears     int    `json:"token_supply_fixed_years" binding:"required" example:"8"`
 	TokenAmountCanMintPerYear string `json:"token_amount_can_mint_per_year" binding:"required" example:"6000000000000000000000000000"`
-	IAOContractAddress string `json:"iao_contract_address" binding:"required" example:"0xAE5015960Ff1E3ad095a7037533b1e3E7240b54D"`
-	AmountToIAO string `json:"amount_to_iao" binding:"required" example:"100000000000000000000000000"`
+	IAOContractAddress        string `json:"iao_contract_address" binding:"required" example:"0xAE5015960Ff1E3ad095a7037533b1e3E7240b54D"`
+	AmountToIAO               string `json:"amount_to_iao" binding:"required" example:"100000000000000000000000000"`
 }
 
 func (req *DeployTokenRequest) ToMap() map[string]string {
@@ -36,8 +36,8 @@ func (req *DeployTokenRequest) ToMap() map[string]string {
 		"TOKEN_INIT_SUPPLY":              req.TokenInitSupply,
 		"TOKEN_SUPPLY_FIXED_YEARS":       fmt.Sprintf("%d", req.TokenSupplyFixedYears),
 		"TOKEN_AMOUNT_CAN_MINT_PER_YEAR": req.TokenAmountCanMintPerYear,
-		"IAO_CONTRACT_ADDRESS": req.IAOContractAddress,
-		"AMOUNT_TO_IAO": req.AmountToIAO,
+		"IAO_CONTRACT_ADDRESS":           req.IAOContractAddress,
+		"AMOUNT_TO_IAO":                  req.AmountToIAO,
 	}
 }
 

@@ -42,7 +42,7 @@ func main() {
 	api.RegisterDeployIAORoutes(router)
 	api.RegisterDeployStakingRoutes(router)
 	api.RegisterDeployTokenRoutes(router)
-    api.RegisterDeployPaymentRoutes(router)
+	api.RegisterDeployPaymentRoutes(router)
 	log.Printf("Server starting on :8070 in %s mode", *env)
 	if err := router.Run("0.0.0.0:8070"); err != nil {
 		log.Fatal(err)

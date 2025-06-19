@@ -44,9 +44,9 @@ func DeployContract(path, envPath string, scriptEnvVars map[string]string, tp co
 	if tp == TOKEN {
 		deployTarget = "deploy-token-dbc-mainnet"
 	}
-    if tp == PAYMENT {
-        deployTarget = "deploy-payment-mainnet"
-    }
+	if tp == PAYMENT {
+		deployTarget = "deploy-payment-mainnet"
+	}
 	cmd := execCommand("bash", "-c", fmt.Sprintf(
 		"make %s PRIVATE_KEY=%s dbc-mainnet=%s MAIN_NET_VERIFIER_URL=%s",
 		deployTarget,

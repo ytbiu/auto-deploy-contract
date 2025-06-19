@@ -23,7 +23,6 @@ type DeployStakingRequest struct {
 	NFT                 string `json:"nft"  binding:"required,nowhitespace" example:"0x07D325030dA1A8c1f96C414BFFbe4fBD539CED45"`
 }
 
-
 func (req *DeployStakingRequest) ToMap() map[string]string {
 	return map[string]string{
 		"OWNER":                  req.Owner,
