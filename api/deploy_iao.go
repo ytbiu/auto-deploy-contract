@@ -27,6 +27,7 @@ type DeployIAORequest struct {
 	StartTimestamp int64  `json:"start_timestamp" binding:"required" example:"1743663600"`
 	DurationHours  int    `json:"duration_hours" binding:"required" example:"72"`
 	RewardAmount   string `json:"reward_amount" binding:"required" example:"2000000000000000000000000000"`
+	TokenInAddress string `json:"token_in_address" binding:"required" example:"0x07D325030dA1A8c1f96C414BFFbe4fBD539CED45"`
 }
 
 func (req *DeployIAORequest) ToMap() map[string]string {
@@ -36,6 +37,7 @@ func (req *DeployIAORequest) ToMap() map[string]string {
 		"XAAIAO_START_TIMESTAMP":       fmt.Sprintf("%d", req.StartTimestamp),
 		"XAAIAO_PERIOD_HOURS":          fmt.Sprintf("%d", req.DurationHours),
 		"XAAIAO_REWARD_AMOUNT":         req.RewardAmount,
+		"XAAIAO_TOKEN_IN_CONTRACT":     req.TokenInAddress,
 	}
 }
 

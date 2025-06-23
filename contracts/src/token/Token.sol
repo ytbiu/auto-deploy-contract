@@ -83,7 +83,7 @@ contract Token is
         initSupply = _initSupply;
         supplyFixedYears = _supplyFixedYears;
         amountCanMintPerYear = _amountCanMintPerYear;
-        lockLimit = 100;
+        lockLimit = 200;
         _mint(initialOwner, initSupply-amountToIAO);
         _mint(_iaoContractAddress, amountToIAO);
         isLockActive = true;
@@ -108,13 +108,14 @@ contract Token is
         lockLimit = _lockLimit;
     }
 
-    function updateLockDuration(address wallet, uint256 lockSeconds) external onlyOwner {
-        LockInfo[] storage lockInfos = walletLockTimestamp[wallet];
-        for (uint256 i = 0; i < lockInfos.length; i++) {
-            lockInfos[i].unlockAt = lockInfos[i].lockedAt + lockSeconds;
-        }
-        emit UpdateLockDuration(wallet, lockSeconds);
-    }
+    // function updateLockDuration(address wallet, uint256 lockSeconds) external onlyOwner {
+    //     require(wallet != owner(), "Invalid wallet address");
+    //     LockInfo[] storage lockInfos = walletLockTimestamp[wallet];
+    //     for (uint256 i = 0; i < lockInfos.length; i++) {
+    //         lockInfos[i].unlockAt = lockInfos[i].lockedAt + lockSeconds;
+    //     }
+    //     emit UpdateLockDuration(wallet, lockSeconds);
+    // }
 
     function transferAndLock(address to, uint256 value, uint256 lockSeconds) external onlyLockTransferAdminOrOwner {
         require(lockSeconds > 0, "Invalid lock duration");

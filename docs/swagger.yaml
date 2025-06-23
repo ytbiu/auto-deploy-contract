@@ -16,12 +16,16 @@ definitions:
       start_timestamp:
         example: 1743663600
         type: integer
+      token_in_address:
+        example: 0x07D325030dA1A8c1f96C414BFFbe4fBD539CED45
+        type: string
     required:
     - duration_hours
     - owner
     - reward_amount
     - reward_token
     - start_timestamp
+    - token_in_address
     type: object
   api.DeployPaymentRequest:
     properties:

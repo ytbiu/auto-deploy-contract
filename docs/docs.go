@@ -209,7 +209,8 @@ const docTemplate = `{
                 "owner",
                 "reward_amount",
                 "reward_token",
-                "start_timestamp"
+                "start_timestamp",
+                "token_in_address"
             ],
             "properties": {
                 "duration_hours": {
@@ -231,6 +232,10 @@ const docTemplate = `{
                 "start_timestamp": {
                     "type": "integer",
                     "example": 1743663600
+                },
+                "token_in_address": {
+                    "type": "string",
+                    "example": "0x07D325030dA1A8c1f96C414BFFbe4fBD539CED45"
                 }
             }
         },
