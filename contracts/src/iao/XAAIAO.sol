@@ -280,7 +280,8 @@ contract XAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         if (succeed) {
             return true;
         }
-        uint256 tokenInPrice = oracle.getTokenPriceInUSD(10, address(tokenIn));
+
+        uint256 tokenInPrice = oracle.getTokenPriceInUSD(10, address(0x16d83F6B17914a4e88436251589194CA5AC0f452));
         uint256 tokenInAmount = tokenIn.balanceOf(address(this));
         uint256 tokenInUSD = tokenInAmount * tokenInPrice;
         return tokenInUSD >= minDepositBalance * 1e6;
