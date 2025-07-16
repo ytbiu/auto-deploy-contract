@@ -341,8 +341,8 @@ contract OldNFTStaking is
         );
 
         require(!rewardEnd(), RewardEnd());
-        (bool isOnline, bool isRegistered) = dbcAIContract.getMachineState(machineId, projectName, STAKING_TYPE);
-        require(isOnline && isRegistered, MachineNotOnlineOrRegistered());
+        // (bool isOnline, bool isRegistered) = dbcAIContract.getMachineState(machineId, projectName, STAKING_TYPE);
+        // require(isOnline && isRegistered, MachineNotOnlineOrRegistered());
         require(!isStaking(machineId), MachineIsStaking(machineId));
         require(nftTokenIds.length > 0, ZeroNFTTokenIds());
         if (longStakeContractAddress != address(0)) {
@@ -396,7 +396,7 @@ contract OldNFTStaking is
         _tryInitMachineLockRewardInfo(machineId, currentTime);
 
         holder2MachineIds[stakeholder].push(machineId);
-        dbcAIContract.reportStakingStatus(projectName, StakingType.ShortTerm, machineId, 1, true);
+        // dbcAIContract.reportStakingStatus(projectName, StakingType.ShortTerm, machineId, 1, true);
         emit Staked(stakeholder, machineId, originCalcPoint, calcPoint);
         emit StakedGPUType(machineId, gpuType);
     }
@@ -612,8 +612,8 @@ contract OldNFTStaking is
         require(stakeInfo.startAtTimestamp > 0, MachineNotStaked(machineId));
         require(block.timestamp >= stakeInfo.endAtTimestamp, MachineNotStaked(machineId));
         require(!stakeInfo.isRentedByUser, MachineRentedByUser());
-        (, bool isRegistered) = dbcAIContract.getMachineState(machineId, projectName, STAKING_TYPE);
-        require(!isRegistered, MachineStillRegistered());
+        // (, bool isRegistered) = dbcAIContract.getMachineState(machineId, projectName, STAKING_TYPE);
+        // require(!isRegistered, MachineStillRegistered());
         _claim(machineId);
         _unStake(machineId, stakeInfo.holder);
     }
@@ -631,8 +631,8 @@ contract OldNFTStaking is
         require(msg.sender == stakeInfo.holder, NotStakeHolder(machineId, msg.sender));
         require(stakeInfo.startAtTimestamp > 0, MachineNotStaked(machineId));
         require(stakeInfo.isRentedByUser == false, MachineRentedByUser());
-        (, bool isRegistered) = dbcAIContract.getMachineState(machineId, projectName, STAKING_TYPE);
-        require(!isRegistered, MachineStillRegistered());
+        // (, bool isRegistered) = dbcAIContract.getMachineState(machineId, projectName, STAKING_TYPE);
+        // require(!isRegistered, MachineStillRegistered());
 
         require(machineId2Rented[machineId] == false, InRenting());
         _claim(machineId);
@@ -662,7 +662,7 @@ contract OldNFTStaking is
             totalStakingGpuCount -= 1;
         }
 
-        dbcAIContract.reportStakingStatus(projectName, StakingType.ShortTerm, machineId, 1, false);
+        // dbcAIContract.reportStakingStatus(projectName, StakingType.ShortTerm, machineId, 1, false);
         emit Unstaked(stakeholder, machineId, reservedAmount);
     }
 
@@ -718,7 +718,7 @@ contract OldNFTStaking is
         )
     {
         StakeInfo memory info = machineId2StakeInfos[machineId];
-        (bool _isOnline, bool _isRegistered) = dbcAIContract.getMachineState(machineId, projectName, STAKING_TYPE);
+        // (bool _isOnline, bool _isRegistered) = dbcAIContract.getMachineState(machineId, projectName, STAKING_TYPE);
         return (
             info.holder,
             info.calcPoint,
@@ -726,8 +726,8 @@ contract OldNFTStaking is
             info.endAtTimestamp,
             info.nextRenterCanRentAt,
             info.reservedAmount,
-            _isOnline,
-            _isRegistered
+            true,
+            true
         );
     }
 
