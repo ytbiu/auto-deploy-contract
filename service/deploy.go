@@ -33,7 +33,12 @@ func DeployContract(path, envPath string, scriptEnvVars map[string]string, tp co
 	defer func() {
 		cleanCMD := execCommand("forge", "clean")
 		cleanCMD.Dir = path
-
+		// Set environment variables with explicit paths to avoid version conflicts
+		env := os.Environ()
+		// Prioritize correct Node.js version and forge paths
+		pathVar := "/home/ubuntu/.nvm/versions/node/v23.9.0/bin:/home/ubuntu/.foundry/bin:/usr/local/bin:/usr/bin:/bin"
+		env = append(env, "PATH="+pathVar)
+		cleanCMD.Env = env
 		_, _ = cleanCMD.CombinedOutput()
 	}()
 
@@ -55,6 +60,12 @@ func DeployContract(path, envPath string, scriptEnvVars map[string]string, tp co
 		MAIN_NET_VERIFIER_URL,
 	))
 	cmd.Dir = path
+	// Set environment variables with explicit paths to avoid version conflicts
+	env := os.Environ()
+	// Prioritize correct Node.js version and forge paths
+	pathVar := "/home/ubuntu/.nvm/versions/node/v23.9.0/bin:/home/ubuntu/.foundry/bin:/usr/local/bin:/usr/bin:/bin"
+	env = append(env, "PATH="+pathVar)
+	cmd.Env = env
 
 	log.Printf("Executing command:  make %s PRIVATE_KEY=%s dbc-mainnet=%s MAIN_NET_VERIFIER_URL=%s",
 		deployTarget,

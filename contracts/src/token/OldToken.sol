@@ -62,7 +62,6 @@ contract OldToken is
         _disableInitializers();
     }
 
-
     function initialize(
         address initialOwner,
         string calldata name,
@@ -72,7 +71,7 @@ contract OldToken is
         uint256 _amountCanMintPerYear,
         address _iaoContractAddress,
         uint256 _amountToIAO
-    )  public initializer {
+    ) public initializer {
         __ERC20_init(name, symbol);
         __ERC20Permit_init(name);
         __ERC20Burnable_init();
@@ -85,7 +84,7 @@ contract OldToken is
         supplyFixedYears = _supplyFixedYears;
         amountCanMintPerYear = _amountCanMintPerYear;
         lockLimit = 100;
-        _mint(initialOwner, initSupply-amountToIAO);
+        _mint(initialOwner, initSupply - amountToIAO);
         _mint(_iaoContractAddress, amountToIAO);
         isLockActive = true;
         deployedAt = block.timestamp;

@@ -156,7 +156,7 @@ contract XAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
 
             emit RewardsClaimed(msg.sender, userReward);
         } else {
-            require(block.timestamp - endTime >= 10 minutes,  "Distribution not end");
+            require(block.timestamp - endTime >= 10 minutes, "Distribution not end");
             hasClaimed[msg.sender] = true;
             uint256 tokenInAmount = userDeposits[msg.sender];
             require(tokenIn.transfer(msg.sender, tokenInAmount), "tokenIn transfer failed");
@@ -254,10 +254,10 @@ contract XAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         emit TimeUpdated(startTime, endTime);
     }
 
-
     function setMinDepositBalance(uint256 _minDepositBalance) external onlyOwner {
         minDepositBalance = _minDepositBalance;
     }
+
     function setAdmin(address _admin, bool _isAdmin) external onlyOwner {
         admins[_admin] = _isAdmin;
     }

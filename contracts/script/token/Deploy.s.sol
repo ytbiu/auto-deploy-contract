@@ -57,13 +57,22 @@ contract Deploy is Script {
         console.log("iaoContractAddress :", iaoContractAddress);
 
         uint256 amountToIAO = uint256(vm.envInt("AMOUNT_TO_IAO"));
-        console.log("amountToIAO :",  amountToIAO);
+        console.log("amountToIAO :", amountToIAO);
 
         proxy = Upgrades.deployUUPSProxy(
             "Token.sol:Token",
             abi.encodeCall(
                 Token.initialize,
-                (tokenOwner, tokenName, tokenSymbol, initSupply, supplyFixedYears, amountCanMintPerYear,iaoContractAddress,amountToIAO)
+                (
+                    tokenOwner,
+                    tokenName,
+                    tokenSymbol,
+                    initSupply,
+                    supplyFixedYears,
+                    amountCanMintPerYear,
+                    iaoContractAddress,
+                    amountToIAO
+                )
             )
         );
         return (proxy, logic);

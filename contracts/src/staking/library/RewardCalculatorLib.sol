@@ -29,7 +29,13 @@ library RewardCalculatorLib {
 
         if (block.timestamp < rewardsStart) return rewardsPerTokenOut;
 
-        uint256 updateTime = block.timestamp < rewardsEnd ? block.timestamp : rewardsEnd;
+        uint256 updateTime;
+        if (rewardsEnd > 0) {
+            updateTime = block.timestamp < rewardsEnd ? block.timestamp : rewardsEnd;
+        } else {
+            updateTime = block.timestamp;
+        }
+        updateTime = block.timestamp < rewardsEnd ? block.timestamp : rewardsEnd;
         uint256 elapsed = updateTime > rewardsPerShareIn.lastUpdated ? updateTime - rewardsPerShareIn.lastUpdated : 0;
 
         if (elapsed == 0) return rewardsPerTokenOut;

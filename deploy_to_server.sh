@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # 服务器信息
-SERVER_IP="3.0.25.131"
+SERVER_IP="54.179.233.88"
 SERVER_USER="ubuntu"
-SERVER_DIR="/data/xaa/auto-deploy-contract"
+SERVER_DIR="/home/ubuntu/projects/auto-deploy-contract"
 
 # Git分支名称
 GIT_BRANCH=${1:-"main"}
@@ -28,22 +28,19 @@ ssh $SERVER_USER@$SERVER_IP "pid=\$(ps aux | grep '[a]uto-deploy-contract' | awk
 echo "上传文件到服务器..."
 ssh $SERVER_USER@$SERVER_IP "rm  $SERVER_DIR/auto-deploy-contract"
 scp ./build/auto-deploy-contract $SERVER_USER@$SERVER_IP:$SERVER_DIR/
-scp ./build/.env $SERVER_USER@$SERVER_IP:$SERVER_DIR/
+scp ./build/.env $SERVER_USER@$SERVER_IP:$SERVER_DIR/ && ls
 
 echo "拉去git代码"
-ssh $SERVER_USER@$SERVER_IP "cd $SERVER_DIR && rm go.mod go.sum && git pull"
+ssh $SERVER_USER@$SERVER_IP "cd $SERVER_DIR  && git pull"
 
 # 在服务器上启动服务
 echo "启动服务..."
-ssh $SERVER_USER@$SERVER_IP << 'EOF'
-cd /data/xaa/auto-deploy-contract
-pid=$(pgrep auto-deploy-contract)
-if [ ! -z "$pid" ]; then
-    echo "终止已运行的程序 (PID: $pid)..."
-    kill $pid
-    sleep 2
-fi
+ssh $SERVER_USER@$SERVER_IP << EOF
+cd $SERVER_DIR
+chmod +x ./auto-deploy-contract
 nohup ./auto-deploy-contract --env prod > output.log 2>&1 &
+echo "服务已启动，PID: \$!"
+ps aux | grep '[a]uto-deploy-contract'
 EOF
 
 echo "部署完成！"

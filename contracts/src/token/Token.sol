@@ -30,6 +30,7 @@ contract Token is
         uint256 unlockAt;
     }
 
+    address public stakingContractAddress;
     bool public isLockActive;
     uint256 public initSupply;
     uint256 public supplyFixedYears;
@@ -51,6 +52,7 @@ contract Token is
     event RemoveLockTransferAdmin(address indexed addr);
     event AuthorizedUpgradeSelf(address indexed canUpgradeAddress);
     event DisableContractUpgrade(uint256 timestamp);
+    event SetStakingContract(address indexed target);
 
     modifier onlyLockTransferAdminOrOwner() {
         require(lockTransferAdmins[msg.sender] || msg.sender == owner(), "Not lock transfer admin");
@@ -84,7 +86,7 @@ contract Token is
         supplyFixedYears = _supplyFixedYears;
         amountCanMintPerYear = _amountCanMintPerYear;
         lockLimit = 200;
-        _mint(initialOwner, initSupply-amountToIAO);
+        _mint(initialOwner, initSupply - amountToIAO);
         _mint(_iaoContractAddress, amountToIAO);
         isLockActive = true;
         deployedAt = block.timestamp;
@@ -155,15 +157,19 @@ contract Token is
         return super.transferFrom(from, to, amount);
     }
 
-    function mint(address to, uint256 amount) external onlyOwner {
-        require(amount > 0, "Mint amount must be positive");
+    function setStakingContract(address stakingContract) external onlyOwner {
+        stakingContractAddress = stakingContract;
+        emit SetStakingContract(stakingContract);
+    }
+
+    function mint() external {
         uint256 yearsSinceDeploy = (block.timestamp - deployedAt) / 365 days;
         require(yearsSinceDeploy >= supplyFixedYears, "Minting not allowed yet");
-        require(mintedPerYear[yearsSinceDeploy] + amount <= amountCanMintPerYear, "Exceeds annual mint limit");
+        require(mintedPerYear[yearsSinceDeploy] < amountCanMintPerYear, "Exceeds annual mint limit");
 
-        mintedPerYear[yearsSinceDeploy] += amount;
-        _mint(to, amount);
-        emit Mint(to, amount);
+        mintedPerYear[yearsSinceDeploy] += amountCanMintPerYear;
+        _mint(stakingContractAddress, amountCanMintPerYear);
+        emit Mint(stakingContractAddress, amountCanMintPerYear);
     }
 
     function calculateLockedAmountAndUpdate(address from) public returns (uint256) {
