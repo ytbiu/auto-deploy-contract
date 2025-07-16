@@ -30,6 +30,7 @@ contract OldToken is
         uint256 unlockAt;
     }
 
+    address public stakingContractAddress;
     bool public isLockActive;
     uint256 public initSupply;
     uint256 public supplyFixedYears;
@@ -51,6 +52,7 @@ contract OldToken is
     event RemoveLockTransferAdmin(address indexed addr);
     event AuthorizedUpgradeSelf(address indexed canUpgradeAddress);
     event DisableContractUpgrade(uint256 timestamp);
+    event SetStakingContract(address indexed target);
 
     modifier onlyLockTransferAdminOrOwner() {
         require(lockTransferAdmins[msg.sender] || msg.sender == owner(), "Not lock transfer admin");
@@ -83,7 +85,7 @@ contract OldToken is
         initSupply = _initSupply;
         supplyFixedYears = _supplyFixedYears;
         amountCanMintPerYear = _amountCanMintPerYear;
-        lockLimit = 100;
+        lockLimit = 200;
         _mint(initialOwner, initSupply - amountToIAO);
         _mint(_iaoContractAddress, amountToIAO);
         isLockActive = true;
@@ -108,13 +110,14 @@ contract OldToken is
         lockLimit = _lockLimit;
     }
 
-    function updateLockDuration(address wallet, uint256 lockSeconds) external onlyOwner {
-        LockInfo[] storage lockInfos = walletLockTimestamp[wallet];
-        for (uint256 i = 0; i < lockInfos.length; i++) {
-            lockInfos[i].unlockAt = lockInfos[i].lockedAt + lockSeconds;
-        }
-        emit UpdateLockDuration(wallet, lockSeconds);
-    }
+    // function updateLockDuration(address wallet, uint256 lockSeconds) external onlyOwner {
+    //     require(wallet != owner(), "Invalid wallet address");
+    //     LockInfo[] storage lockInfos = walletLockTimestamp[wallet];
+    //     for (uint256 i = 0; i < lockInfos.length; i++) {
+    //         lockInfos[i].unlockAt = lockInfos[i].lockedAt + lockSeconds;
+    //     }
+    //     emit UpdateLockDuration(wallet, lockSeconds);
+    // }
 
     function transferAndLock(address to, uint256 value, uint256 lockSeconds) external onlyLockTransferAdminOrOwner {
         require(lockSeconds > 0, "Invalid lock duration");
@@ -154,15 +157,19 @@ contract OldToken is
         return super.transferFrom(from, to, amount);
     }
 
-    function mint(address to, uint256 amount) external onlyOwner {
-        require(amount > 0, "Mint amount must be positive");
+    function setStakingContract(address stakingContract) external onlyOwner {
+        stakingContractAddress = stakingContract;
+        emit SetStakingContract(stakingContract);
+    }
+
+    function mint() external {
         uint256 yearsSinceDeploy = (block.timestamp - deployedAt) / 365 days;
         require(yearsSinceDeploy >= supplyFixedYears, "Minting not allowed yet");
-        require(mintedPerYear[yearsSinceDeploy] + amount <= amountCanMintPerYear, "Exceeds annual mint limit");
+        require(mintedPerYear[yearsSinceDeploy] < amountCanMintPerYear, "Exceeds annual mint limit");
 
-        mintedPerYear[yearsSinceDeploy] += amount;
-        _mint(to, amount);
-        emit Mint(to, amount);
+        mintedPerYear[yearsSinceDeploy] += amountCanMintPerYear;
+        _mint(stakingContractAddress, amountCanMintPerYear);
+        emit Mint(stakingContractAddress, amountCanMintPerYear);
     }
 
     function calculateLockedAmountAndUpdate(address from) public returns (uint256) {

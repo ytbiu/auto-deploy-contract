@@ -20,6 +20,7 @@ import {ToolLib} from "./library/ToolLib.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
+/// @custom:oz-upgrades-from OldNFTStaking
 contract OldNFTStaking is
     Initializable,
     ReentrancyGuardUpgradeable,
@@ -29,7 +30,7 @@ contract OldNFTStaking is
 {
     uint8 public constant SECONDS_PER_BLOCK = 6;
     uint256 public constant BASE_RESERVE_AMOUNT = 10_000 ether;
-    uint256 public constant REWARD_DURATION = 60 days;
+    uint256 public constant REWARD_DURATION = 0; // never stop
     uint8 public constant MAX_NFTS_PER_MACHINE = 20;
     uint256 public constant LOCK_PERIOD = 180 days;
     StakingType public constant STAKING_TYPE = StakingType.LongTerm;
@@ -240,7 +241,6 @@ contract OldNFTStaking is
         rewardAmountPerYear = _rewardAmountPerYear;
         dailyRewardAmount = rewardAmountPerYear / 365 days;
         canUpgradeAddress = msg.sender;
-        rewardStartAtTimestamp = block.timestamp;
         rewardsPerCalcPoint.lastUpdated = block.timestamp;
     }
 
@@ -341,8 +341,8 @@ contract OldNFTStaking is
         );
 
         require(!rewardEnd(), RewardEnd());
-        // (bool isOnline, bool isRegistered) = dbcAIContract.getMachineState(machineId, projectName, STAKING_TYPE);
-        // require(isOnline && isRegistered, MachineNotOnlineOrRegistered());
+        (bool isOnline, bool isRegistered) = dbcAIContract.getMachineState(machineId, projectName, STAKING_TYPE);
+        require(isOnline && isRegistered, MachineNotOnlineOrRegistered());
         require(!isStaking(machineId), MachineIsStaking(machineId));
         require(nftTokenIds.length > 0, ZeroNFTTokenIds());
         if (longStakeContractAddress != address(0)) {
@@ -396,7 +396,7 @@ contract OldNFTStaking is
         _tryInitMachineLockRewardInfo(machineId, currentTime);
 
         holder2MachineIds[stakeholder].push(machineId);
-        // dbcAIContract.reportStakingStatus(projectName, StakingType.ShortTerm, machineId, 1, true);
+        dbcAIContract.reportStakingStatus(projectName, StakingType.ShortTerm, machineId, 1, true);
         emit Staked(stakeholder, machineId, originCalcPoint, calcPoint);
         emit StakedGPUType(machineId, gpuType);
     }
@@ -612,8 +612,8 @@ contract OldNFTStaking is
         require(stakeInfo.startAtTimestamp > 0, MachineNotStaked(machineId));
         require(block.timestamp >= stakeInfo.endAtTimestamp, MachineNotStaked(machineId));
         require(!stakeInfo.isRentedByUser, MachineRentedByUser());
-        // (, bool isRegistered) = dbcAIContract.getMachineState(machineId, projectName, STAKING_TYPE);
-        // require(!isRegistered, MachineStillRegistered());
+        (, bool isRegistered) = dbcAIContract.getMachineState(machineId, projectName, STAKING_TYPE);
+        require(!isRegistered, MachineStillRegistered());
         _claim(machineId);
         _unStake(machineId, stakeInfo.holder);
     }
@@ -631,8 +631,8 @@ contract OldNFTStaking is
         require(msg.sender == stakeInfo.holder, NotStakeHolder(machineId, msg.sender));
         require(stakeInfo.startAtTimestamp > 0, MachineNotStaked(machineId));
         require(stakeInfo.isRentedByUser == false, MachineRentedByUser());
-        // (, bool isRegistered) = dbcAIContract.getMachineState(machineId, projectName, STAKING_TYPE);
-        // require(!isRegistered, MachineStillRegistered());
+        (, bool isRegistered) = dbcAIContract.getMachineState(machineId, projectName, STAKING_TYPE);
+        require(!isRegistered, MachineStillRegistered());
 
         require(machineId2Rented[machineId] == false, InRenting());
         _claim(machineId);
@@ -662,7 +662,7 @@ contract OldNFTStaking is
             totalStakingGpuCount -= 1;
         }
 
-        // dbcAIContract.reportStakingStatus(projectName, StakingType.ShortTerm, machineId, 1, false);
+        dbcAIContract.reportStakingStatus(projectName, StakingType.ShortTerm, machineId, 1, false);
         emit Unstaked(stakeholder, machineId, reservedAmount);
     }
 
@@ -718,7 +718,7 @@ contract OldNFTStaking is
         )
     {
         StakeInfo memory info = machineId2StakeInfos[machineId];
-        // (bool _isOnline, bool _isRegistered) = dbcAIContract.getMachineState(machineId, projectName, STAKING_TYPE);
+        (bool _isOnline, bool _isRegistered) = dbcAIContract.getMachineState(machineId, projectName, STAKING_TYPE);
         return (
             info.holder,
             info.calcPoint,
@@ -726,8 +726,8 @@ contract OldNFTStaking is
             info.endAtTimestamp,
             info.nextRenterCanRentAt,
             info.reservedAmount,
-            true,
-            true
+            _isOnline,
+            _isRegistered
         );
     }
 
@@ -746,8 +746,8 @@ contract OldNFTStaking is
         emit PaySlash(machineId, slashToPayAddress, BASE_RESERVE_AMOUNT);
     }
 
-    function getGlobalState() external view returns (uint256, uint256, uint256) {
-        return (totalCalcPoint, totalReservedAmount, rewardStartAtTimestamp + REWARD_DURATION);
+    function getGlobalState() external view returns (uint256, uint256) {
+        return (totalCalcPoint, totalReservedAmount);
     }
 
     function _getRewardDetail(uint256 totalRewardAmount)
@@ -788,7 +788,7 @@ contract OldNFTStaking is
             return RewardCalculatorLib.RewardsPerShare(0, 0);
         }
         //        uint256 rewardEndAt = Math.min(rewardStartAtTimestamp + REWARD_DURATION, stakeEndAtTimestamp);
-        uint256 rewardEndAt = rewardStartAtTimestamp + REWARD_DURATION;
+        uint256 rewardEndAt = REWARD_DURATION == 0 ? 0 : rewardStartAtTimestamp + REWARD_DURATION;
 
         RewardCalculatorLib.RewardsPerShare memory rewardsPerTokenUpdated = RewardCalculatorLib.getUpdateRewardsPerShare(
             rewardsPerCalcPoint, totalAdjustUnit, rewardsPerSeconds, rewardStartAtTimestamp, rewardEndAt
@@ -867,25 +867,25 @@ contract OldNFTStaking is
     }
 
     function rewardEnd() public view returns (bool) {
-        if (rewardStartAtTimestamp == 0) {
+        if (REWARD_DURATION == 0 || rewardStartAtTimestamp == 0) {
             return false;
         }
         return (block.timestamp > rewardStartAtTimestamp + REWARD_DURATION);
     }
 
-    function getRewardEndAtTimestamp(uint256 stakeEndAtTimestamp) internal view returns (uint256) {
-        uint256 rewardEndAt = rewardStartAtTimestamp + REWARD_DURATION;
-        uint256 currentTime = block.timestamp;
-        if (stakeEndAtTimestamp > rewardEndAt) {
-            return rewardEndAt;
-        } else if (stakeEndAtTimestamp > currentTime && stakeEndAtTimestamp - currentTime <= 1 hours) {
-            return stakeEndAtTimestamp > 1 hours ? stakeEndAtTimestamp - 1 hours : 0;
-        }
-        if (stakeEndAtTimestamp != 0 && stakeEndAtTimestamp < currentTime) {
-            return stakeEndAtTimestamp;
-        }
-        return currentTime;
-    }
+    // function getRewardEndAtTimestamp(uint256 stakeEndAtTimestamp) internal view returns (uint256) {
+    //     uint256 rewardEndAt = rewardStartAtTimestamp + REWARD_DURATION;
+    //     uint256 currentTime = block.timestamp;
+    //     if (stakeEndAtTimestamp > rewardEndAt) {
+    //         return rewardEndAt;
+    //     } else if (stakeEndAtTimestamp > currentTime && stakeEndAtTimestamp - currentTime <= 1 hours) {
+    //         return stakeEndAtTimestamp > 1 hours ? stakeEndAtTimestamp - 1 hours : 0;
+    //     }
+    //     if (stakeEndAtTimestamp != 0 && stakeEndAtTimestamp < currentTime) {
+    //         return stakeEndAtTimestamp;
+    //     }
+    //     return currentTime;
+    // }
 
     function getRewardStartTime(uint256 _rewardStartAtTimestamp) public view returns (uint256) {
         if (_rewardStartAtTimestamp == 0) {
