@@ -163,6 +163,7 @@ contract Token is
     }
 
     function mint() external {
+        require(stakingContractAddress != address(0), "Invalid staking contract address");
         uint256 yearsSinceDeploy = (block.timestamp - deployedAt) / 365 days;
         require(yearsSinceDeploy >= supplyFixedYears, "Minting not allowed yet");
         require(mintedPerYear[yearsSinceDeploy] < amountCanMintPerYear, "Exceeds annual mint limit");
