@@ -35,6 +35,8 @@ contract OldXAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
 
     // Total amount of tokenIn deposited in the contract
     uint256 public totalDepositedTokenIn;
+
+    uint256 public totalJoinedAddress;
     // Mapping to store the amount of TokenIn deposited by each user
     mapping(address => uint256) public userDeposits;
 
