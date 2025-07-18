@@ -40,6 +40,9 @@ contract XAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
 
     // Total amount of tokenIn deposited in the contract
     uint256 public totalDepositedTokenIn;
+
+    uint256 public totalJoinedAddress;
+
     // Mapping to store the amount of TokenIn deposited by each user
     mapping(address => uint256) public userDeposits;
 
@@ -150,7 +153,6 @@ contract XAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
 
             // Mark rewards as claimed
             hasClaimed[msg.sender] = true;
-
             // Transfer rewards to the user
             require(rewardToken.transfer(msg.sender, userReward), "rewards transfer failed");
 
@@ -228,6 +230,9 @@ contract XAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
 
         SafeERC20.safeTransferFrom(tokenIn, msg.sender, address(this), amount);
         // Record deposit
+        if (userDeposits[msg.sender] == 0) {
+            totalJoinedAddress += 1;
+        }
         userDeposits[msg.sender] += amount;
         totalDepositedTokenIn += amount;
         emit DepositTokenIn(msg.sender, amount);
