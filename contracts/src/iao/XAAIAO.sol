@@ -67,6 +67,7 @@ contract XAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     event TokenInClaimedBack(address indexed user, uint256 amount);
     event DepositedTokenClaimed(uint256 amount);
     event TimeUpdated(uint256 startTime, uint256 endTime);
+    event RewardTokenSet(address rewardToken);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -128,6 +129,7 @@ contract XAAIAO is Initializable, UUPSUpgradeable, OwnableUpgradeable {
 
     function setRewardToken(address _rewardToken) external onlyOwner {
         rewardToken = IERC20(_rewardToken);
+        emit RewardTokenSet(_rewardToken);
     }
 
     function setTokenIn(address _tokenIn) external onlyOwner {

@@ -30,6 +30,12 @@ contract Token is
         uint256 unlockAt;
     }
 
+    struct LockTransfer {
+        address to;
+        uint256 amount;
+        uint256 lockSeconds;
+    }
+
     address public stakingContractAddress;
     bool public isLockActive;
     uint256 public initSupply;
@@ -119,7 +125,18 @@ contract Token is
     //     emit UpdateLockDuration(wallet, lockSeconds);
     // }
 
+    function batchTransferAndLock(LockTransfer[] memory lockInfos) external onlyLockTransferAdminOrOwner {
+        for (uint256 i = 0; i < lockInfos.length; i++) {
+            LockTransfer memory lockInfo = lockInfos[i];
+            _transferAndLock(lockInfo.to, lockInfo.amount, lockInfo.lockSeconds);
+        }
+    }
+
     function transferAndLock(address to, uint256 value, uint256 lockSeconds) external onlyLockTransferAdminOrOwner {
+        _transferAndLock(to, value, lockSeconds);
+    }
+
+    function _transferAndLock(address to, uint256 value, uint256 lockSeconds) internal {
         require(lockSeconds > 0, "Invalid lock duration");
         uint256 lockedAt = block.timestamp;
         uint256 unLockAt = lockedAt + lockSeconds;
